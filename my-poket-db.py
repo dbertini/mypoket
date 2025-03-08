@@ -100,7 +100,7 @@ def main():
 
     logging.info("Start-up BOT MY-POKET")
     logging.info("TOKEN UTILIZZATO: " + TOKEN)
-    logging.info("ID AUTORIZZATO: " + AUTHORIZED_USER_ID)
+    #logging.info("ID AUTORIZZATO: " + AUTHORIZED_USER_ID)
 
 
     app = Application.builder().token(TOKEN).build()
