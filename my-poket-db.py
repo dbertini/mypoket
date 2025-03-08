@@ -20,6 +20,9 @@ DB_CONFIG = {
 TOKEN = os.getenv("TOKEN")
 AUTHORIZED_USER_ID = os.getenv("MY_USERID")   # Sostituisci con il tuo ID Telegram
 
+
+
+
 async def start(update: Update, context: CallbackContext) -> None:
     """Messaggio di benvenuto."""
     if update.message.chat_id == AUTHORIZED_USER_ID:
@@ -94,6 +97,12 @@ async def totale(update: Update, context: CallbackContext) -> None:
 
 def main():
     """Avvia il bot."""
+
+    logging.info("Start-up BOT MY-POKET")
+    logging.info("TOKEN UTILIZZATO: " + TOKEN)
+    logging.info("ID AUTORIZZATO: " + AUTHORIZED_USER_ID)
+
+
     app = Application.builder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
