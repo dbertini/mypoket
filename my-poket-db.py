@@ -91,6 +91,7 @@ async def totale(update: Update, context: CallbackContext) -> None:
         except Exception as e:
             logging.error(f"Errore nel comando /totale: {e}")
             await update.message.reply_text("Errore nel calcolo del totale delle spese.")
+
 async def ultime_10_spese(update: Update, context: CallbackContext) -> None:
     """Mostra le ultime 10 spese ordinate per data operazione."""
     if update.message.chat_id == AUTHORIZED_USER_ID:
@@ -126,6 +127,42 @@ async def ultime_10_spese(update: Update, context: CallbackContext) -> None:
             logging.error(f"Errore nel comando /ultime_10_spese: {e}")
             await update.message.reply_text("Errore nel recupero delle ultime spese.")
 
+async def ultime_15_entry(update: Update, context: CallbackContext) -> None:
+    """Mostra le ultime 15 spese/introiti inserite nel database ordinate per id."""
+    if update.message.chat_id == AUTHORIZED_USER_ID:
+        try:
+            conn = psycopg2.connect(**DB_CONFIG)
+            cur = conn.cursor()
+
+            # Query per ottenere Mostra le ultime 15 spese/introiti inserite nel database ordinate per id
+            cur.execute(
+                """
+                SELECT spesa, dare_avere, categoria, TO_CHAR(data_operazione, 'DD-MM-YYYY'), note
+                FROM transazioni
+                ORDER BY id DESC
+                LIMIT 15;
+                """
+            )
+            rows = cur.fetchall()
+            cur.close()
+            conn.close()
+
+            if not rows:
+                await update.message.reply_text("Nessuna entry trovata.")
+                return
+
+            # Formattiamo i risultati
+            response = "**Ultime 15 entry:**\n"
+            for spesa, dare_avere, categoria, data_operazione, note in rows:
+                response += f"📅 {data_operazione} | 💰 {spesa:.2f}€ ({dare_avere}) | 📌 {categoria} | 📝 {note}\n"
+
+            await update.message.reply_text(response, parse_mode="Markdown")
+
+        except Exception as e:
+            logging.error(f"Errore nel comando /ultime_15_entry: {e}")
+            await update.message.reply_text("Errore nel recupero delle ultime entry.")
+
+
 def main():
     """Avvia il bot."""
 
@@ -136,6 +173,7 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("totale", totale))
     app.add_handler(CommandHandler("ultime_10_spese", ultime_10_spese))
+    app.add_handler(CommandHandler("ultime_15_entry", ultime_15_entry))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, log_to_db))
 
     app.run_polling()
